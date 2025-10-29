@@ -1,0 +1,78 @@
+[
+  {
+    "Id": "86a904fc-b84c-409e-b9a8-c5774931d9ff",
+    "Ip": "131.10.11.176",
+    "Nome": "E157G500274",
+    "Descricao": "",
+    "Modelo": "RICOH MP C3003 1.39 / RICOH Network Printer C model / RICOH Network Scanner C model / RICOH Network Facsimile C model",
+    "NumeroSerie": "E157G500274",
+    "Status": "Aguardando",
+    "Foto": "N/A",
+    "ContadorTotal": 121037,
+    "Toners": {
+      "Black": 90,
+      "Cyan": 80,
+      "Magenta": 60,
+      "Yellow": 30
+    },
+    "Bandejas": {
+      "Bandeja 1": "Desconhecido",
+      "Bandeja 2": "Desconhecido",
+      "Bandeja 3": "Desconhecido",
+      "Bandeja 4": "Desconhecido",
+      "Bandeja 5": "Desconhecido"
+    },
+    "Alertas": [],
+    "EColorida": true
+  },
+  {
+    "Id": "7f560b5c-3d46-4912-a63e-bf22271d3d90",
+    "Ip": "131.10.11.170",
+    "Nome": "3TX410627",
+    "Descricao": "",
+    "Modelo": "Xerox AltaLink C8035; SS 103.001.021.22300, NC 103.001.22300, UI 103.001.22300, ME 061.022.000, CC 103.001.22300, DF 007.019.000, FI ------, FA 003.016.001, CCOS 103.001.22300, NCOS 103.001.22300, SC 013.015.014, SU 103.001.22300",
+    "NumeroSerie": "3TX410627",
+    "Status": "Em opera\u00E7\u00E3o",
+    "Foto": "N/A",
+    "ContadorTotal": 375503,
+    "Toners": {
+      "Black": 25,
+      "Cyan": 34,
+      "Magenta": 29,
+      "Yellow": 30
+    },
+    "Bandejas": {
+      "Bandeja 1": "Desconhecido",
+      "Bandeja 2": "Desconhecido",
+      "Bandeja 3": "Desconhecido",
+      "Bandeja 4": "Desconhecido",
+      "Bandeja 5": "Desconhecido"
+    },
+    "Alertas": [],
+    "EColorida": true
+  },
+  {
+    "Id": "36578f45-bab2-4526-98e4-c56f8be3368b",
+    "Ip": "131.10.11.219",
+    "Nome": "AL75035274",
+    "Descricao": "",
+    "Modelo": "OKI OkiLAN 9400g Rev.01.11 10/100/1000BASE Ethernet PrintServer: Attached to C911 Rev.A1.57 : Copyright 2021 Oki Electric Industry Co., Ltd. All rights reserved.",
+    "NumeroSerie": "AL75035274",
+    "Status": "Aguardando",
+    "Foto": "N/A",
+    "ContadorTotal": 747948,
+    "Toners": {
+      "Black": 27,
+      "Cyan": 87,
+      "Magenta": 58,
+      "Yellow": 3
+    },
+    "Bandejas": {
+      "Bandeja 1": "Desconhecido",
+      "Bandeja 2": "Desconhecido",
+      "Bandeja 3": "Desconhecido"
+    },
+    "Alertas": [],
+    "EColorida": true
+  }
+]
