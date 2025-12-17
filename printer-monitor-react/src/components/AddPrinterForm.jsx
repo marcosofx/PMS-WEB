@@ -30,11 +30,12 @@ export default function AddPrinterForm({ onAdded }) {
                 imagemUrl = res.url;
             }
 
+            // ✔ CORRIGIDO: agora enviado no formato certo pro backend
             const newPrinter = {
-                NomeCustomizado: nome,
-                Ip: ip,
-                Descricao: descricao,
-                ImagemUrl: imagemUrl
+                nomeCustomizado: nome,
+                ip: ip,
+                descricao: descricao,
+                imagemUrl: imagemUrl
             };
 
             const created = await addPrinter(newPrinter);
@@ -58,12 +59,20 @@ export default function AddPrinterForm({ onAdded }) {
     return (
         <form
             onSubmit={handleSubmit}
-            style={{ display: "flex", flexDirection: "column", gap: "12px", maxWidth: "400px" }}
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px",
+                maxWidth: "400px"
+
+
+            }}
         >
-            {/* Card-style container */}
+            {/* Card container */}
             <div
                 style={{
                     display: "flex",
+                    width: "450px",
                     gap: "12px",
                     padding: "12px",
                     background: "rgba(255,255,255,0.03)",
@@ -72,7 +81,7 @@ export default function AddPrinterForm({ onAdded }) {
                     alignItems: "center"
                 }}
             >
-                {/* Preview / Icon */}
+                {/* Preview */}
                 <div
                     style={{
                         width: "72px",
@@ -83,23 +92,40 @@ export default function AddPrinterForm({ onAdded }) {
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
-                        flexShrink: 0
+                        flexShrink: 0,
+
                     }}
                 >
                     {previewUrl ? (
-                        <img src={previewUrl} alt="preview" style={{ width: "72px", height: "72px", borderRadius: "8px", objectFit: "cover" }} />
+                        <img
+                            src={previewUrl}
+                            alt="preview"
+                            style={{
+                                width: "72px",
+                                height: "72px",
+                                borderRadius: "8px",
+                                objectFit: "cover"
+                            }}
+                        />
                     ) : (
                         <span style={{ fontSize: "32px", color: "#5eead4" }}>🖼️</span>
                     )}
                 </div>
 
                 {/* Inputs */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px", flex: 1 }}>
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "8px",
+                        flex: 1
+                    }}
+                >
                     <input
                         type="text"
                         placeholder="Nome da impressora"
                         value={nome}
-                        onChange={e => setNome(e.target.value)}
+                        onChange={(e) => setNome(e.target.value)}
                         required
                         style={{
                             padding: "8px",
@@ -109,11 +135,12 @@ export default function AddPrinterForm({ onAdded }) {
                             color: "#e6eef8"
                         }}
                     />
+
                     <input
                         type="text"
                         placeholder="IP da impressora"
                         value={ip}
-                        onChange={e => setIp(e.target.value)}
+                        onChange={(e) => setIp(e.target.value)}
                         required
                         style={{
                             padding: "8px",
@@ -123,11 +150,12 @@ export default function AddPrinterForm({ onAdded }) {
                             color: "#e6eef8"
                         }}
                     />
+
                     <input
                         type="text"
                         placeholder="Descrição"
                         value={descricao}
-                        onChange={e => setDescricao(e.target.value)}
+                        onChange={(e) => setDescricao(e.target.value)}
                         style={{
                             padding: "8px",
                             borderRadius: "8px",
@@ -136,24 +164,36 @@ export default function AddPrinterForm({ onAdded }) {
                             color: "#e6eef8"
                         }}
                     />
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={e => setFile(e.target.files[0])}
-                    />
+
+                    <div
+                        className="dropzone"
+                        onClick={() => document.getElementById("fileInput").click()}
+                    >
+                        <p>{file ? file.name : "Clique ou arraste uma imagem aqui"}</p>
+
+                        <input
+                            id="fileInput"
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setFile(e.target.files[0])}
+                            style={{ display: "none" }}
+                        />
+                    </div>
                 </div>
             </div>
 
-            <button
+            <button 
                 type="submit"
                 disabled={loading}
                 style={{
-                    padding: "10px 16px",
+                    padding: "10px 20px",
                     background: "#5eead4",
                     color: "#042",
                     borderRadius: "8px",
                     border: "none",
-                    cursor: "pointer"
+                    cursor: "pointer",
+                    marginRight: "50%",
+                    
                 }}
             >
                 {loading ? "Enviando..." : "Adicionar Impressora"}

@@ -13,6 +13,7 @@
     --maxwidth: 1200px;
 }
 
+/* Base */
 * {
     box-sizing: border-box;
 }
@@ -27,14 +28,15 @@ body {
     padding-bottom: 60px;
 }
 
-/* Header / footer */
+/* Header */
 .app-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 16px;
     padding: 18px 24px;
-    background: #0f1724; /*linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));*/
+    background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+    backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(255,255,255,0.03);
     position: sticky;
     top: 0;
@@ -52,13 +54,12 @@ body {
     color: var(--muted);
 }
 
+/* Navbar */
 .app-header nav a {
     color: var(--muted);
     margin-left: 14px;
     text-decoration: none;
-    position: relative; /* cria um contexto de empilhamento local */
-
-  
+    position: relative;
 }
 
     .app-header nav a:hover {
@@ -69,42 +70,45 @@ body {
         font-size: 22px;
         margin-right: 8px;
         color: var(--muted);
-        z-index: 10; /* garante que fique na frente */
-        position: relative; /* necessário para que o z-index funcione */
+        position: relative;
+        z-index: 10;
     }
 
-    .app-header nav a i:hover {
-        color: var(--accent);
-    }
+        .app-header nav a i:hover {
+            color: var(--accent);
+        }
 
+/* Admin Logout Icon */
 .admin-top {
     color: var(--muted);
     margin-left: 14px;
-    text-decoration: none;
-    position: relative; /* cria um contexto de empilhamento local */
+    position: relative;
+
 }
 
     .admin-top i:hover {
         color: var(--accent);
     }
 
-    /* main container */
-    .app-main {
+/* Main container */
+.app-main {
     max-width: var(--maxwidth);
     margin: 24px auto;
     padding: 0 16px;
+
 }
 
-/* Cards grid */
+/* Grid */
 .cards-grid {
     display: flex;
     flex-wrap: wrap;
     gap: var(--gap);
     align-items: flex-start;
     justify-content: flex-start;
+
 }
 
-/* Individual card */
+/* Printer Card */
 .printer-card {
     width: 220px;
     background: var(--card);
@@ -116,6 +120,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    overflow: hidden;
 }
 
     .printer-card:hover {
@@ -123,14 +128,14 @@ body {
         box-shadow: 0 12px 30px rgba(2,6,23,0.7);
     }
 
-/* top row: image + title */
+/* Card Header */
 .printer-top {
     display: flex;
     gap: 10px;
     align-items: center;
 }
 
-/* imagens / placeholders */
+/* Image / Placeholder */
 .printer-photo,
 .default-icon,
 .preview-icon,
@@ -157,13 +162,14 @@ body {
 
 .printer-placeholder {
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     background: rgba(255,255,255,0.03);
     border-radius: 8px;
     color: var(--muted);
 }
 
+/* Text Info */
 .printer-meta {
     flex: 1;
 }
@@ -175,12 +181,12 @@ body {
 }
 
 .printer-desc {
-    margin: 4px 0 0;
+    margin-top: 4px;
     font-size: 12px;
     color: var(--muted);
 }
 
-/* body info */
+/* Body */
 .printer-body {
     display: flex;
     flex-direction: column;
@@ -195,11 +201,7 @@ body {
     gap: 6px;
 }
 
-.status-text {
-    color: var(--accent);
-}
-
-/* toners */
+/* Toners */
 .printer-toners {
     display: flex;
     gap: 8px;
@@ -209,6 +211,7 @@ body {
 .toner {
     width: 100%;
     display: flex;
+    justify-content: flex-start;
     gap: 8px;
     align-items: center;
 }
@@ -230,7 +233,7 @@ body {
 .toner-fill {
     height: 100%;
     border-radius: 6px;
-    transition: width .5s linear;
+    transition: width .5s ease;
 }
 
 .toner-percent {
@@ -240,87 +243,53 @@ body {
     color: var(--muted);
 }
 
-.no-toner {
-    font-size: 12px;
-    color: var(--muted);
-}
-
-.smooth-update {
-    transition: color 0.4s ease, opacity 0.4s ease;
-}
-
-.toner-fill {
-    transition: width 0.5s ease;
-}
-
-/* Admin area */
+/* Admin Area */
 .admin-area {
     display: flex;
     gap: 20px;
     align-items: flex-start;
+
 }
 
 .admin-left {
     flex: 1;
-    max-width: 520px;
+    max-width: 500px;
+
 }
 
 .admin-right {
-    width: 320px;
+    width: 330px;
     background: var(--card-alt);
     padding: 12px;
     border-radius: 10px;
     border: 1px solid rgba(255,255,255,0.02);
     margin-left: 100px;
+
+
+
 }
 
-/* Form */
-.admin-form {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    margin-bottom: 12px;
-    position: relative;
-    z-index: 2;
-}
-
-    .admin-form input[type="text"],
-    .admin-form input[type="file"],
-    .admin-form input[type="password"] {
-        padding: 8px;
-        border-radius: 8px;
-        border: 1px solid rgba(255,255,255,0.04);
-        background: var(--glass);
-        color: var(--soft);
-        flex: 1;
-    }
-
-    .admin-form button {
-        padding: 8px 12px;
-        background: var(--accent);
-        color: #042;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
-    }
-
-/* List */
+/* Admin List */
 .admin-list {
     list-style: none;
-    margin: 0;
     padding: 0;
+    margin: 0;
     display: flex;
     flex-direction: column;
     gap: 8px;
+
 }
 
 .admin-item {
     display: flex;
-    gap: 10px;
     align-items: center;
+    gap: 10px;
     background: linear-gradient(180deg, rgba(255,255,255,0.015), transparent);
     padding: 8px;
     border-radius: 8px;
+    width: 450px;
+
+
 }
 
     .admin-item img {
@@ -335,6 +304,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 6px;
+
+
 }
 
     .admin-item-info input {
@@ -343,31 +314,128 @@ body {
         border: 1px solid rgba(255,255,255,0.03);
         background: transparent;
         color: var(--soft);
+
     }
 
 .admin-actions {
     display: flex;
     gap: 8px;
 }
+.dropzone {
+    border: 2px dashed #3a3f46;
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+    color: #bbb;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+    .dropzone:hover {
+        background: #2a2f36;
+    }
+
 
 button.danger {
     background: var(--danger);
-    color: #fff;
+    color: white;
     border: none;
     padding: 6px 8px;
     border-radius: 8px;
     cursor: pointer;
 }
 
-/* Preview grid */
+/* Container do login */
+.admin-login-box {
+    max-width: 400px;
+    margin: 5rem auto;
+    padding: 2rem;
+    background: #1a1d21;
+    border-radius: 12px;
+    text-align: center;
+    color: #fff;
+    position: relative;
+}
+
+/* Neon suave nas bordas do container */
+.soft-neon-box {
+    border: 2px solid #00bfff;
+    box-shadow: 0 0 10px rgba(0, 191, 255, 0.4);
+}
+
+/* Título */
+.admin-login-title {
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+    color: #00bfff;
+    text-shadow: 0 0 5px rgba(0, 191, 255, 0.6);
+}
+
+/* Form */
+.admin-login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Input com neon suave */
+.admin-login-input {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #00bfff;
+    background: #2a2e33;
+    color: #fff;
+    outline: none;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+    .admin-login-input::placeholder {
+        color: #888;
+    }
+
+.soft-neon-input:focus {
+    box-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
+    border-color: #00bfff;
+}
+
+/* Botão com neon suave */
+.admin-login-button {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #00bfff;
+    background: #1a1d21;
+    color: #00bfff;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.soft-neon-button:hover {
+    box-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
+    background: #1f2227;
+}
+
+/* Erro */
+.error-text {
+    color: #ff4d4f;
+    font-size: 0.9rem;
+    margin-top: -0.5rem;
+    text-shadow: 0 0 3px rgba(255, 77, 79, 0.6);
+}
+
+
+
+
+/* Preview Cards */
 .preview-grid {
     display: flex;
     flex-direction: column;
     gap: 12px;
     align-items: center;
     margin-top: 12px;
-    position: relative;
-    z-index: 0;
+
 }
 
 .preview-card {
@@ -380,16 +448,57 @@ button.danger {
     box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     width: 100%;
     max-width: 280px;
+
+
 }
 
 .preview-name {
     font-size: 14px;
     color: var(--soft);
-    text-align: left;
     word-break: break-word;
 }
 
-/* responsive */
+/* Skeletons */
+.skeleton {
+    display: inline-block;
+    height: 14px;
+    background: linear-gradient(90deg, #2c2f33, #3a3d42, #2c2f33);
+    background-size: 200%;
+    border-radius: 4px;
+    animation: shimmer 1.5s infinite;
+}
+
+    .skeleton.w-80 {
+        width: 80px;
+    }
+
+    .skeleton.w-60 {
+        width: 60px;
+    }
+
+    .skeleton.w-40 {
+        width: 40px;
+    }
+
+.skeleton-toner {
+    height: 80px;
+    background: linear-gradient(90deg, #2c2f33, #3a3d42, #2c2f33);
+    background-size: 200%;
+    border-radius: 8px;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Responsive */
 @media (max-width:900px) {
     .cards-grid {
         justify-content: center;

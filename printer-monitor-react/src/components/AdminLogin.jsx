@@ -1,24 +1,50 @@
-import React, { useState } from "react";
+Ôªøimport React, { useState } from "react";
+import { motion } from "framer-motion";
 
 export default function AdminLogin({ onAuth }) {
-    const [pw, setPw] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
 
-    const submit = (e) => {
+    const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
+
+    const handleLogin = (e) => {
         e.preventDefault();
-        // Mude aqui sua senha ou coloque verificaÁ„o no back
-        if (pw === "senha123") {
-            localStorage.setItem("admin_auth", "1");
-            onAuth(true);
+
+        if (password === ADMIN_PASSWORD) {
+            onAuth();
         } else {
-            alert("Senha incorreta");
+            setError("Senha incorreta");
         }
     };
 
     return (
-        <form className="admin-login" onSubmit={submit}>
-            <h2>Administrador</h2>
-            <input type="password" placeholder="Senha" value={pw} onChange={e => setPw(e.target.value)} />
-            <button type="submit">Entrar</button>
-        </form>
+        <motion.div
+            className="admin-login-container"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+        >
+            <div className="admin-login-box soft-neon-box">
+                <h2 className="admin-login-title">√Årea Administrativa</h2>
+
+                <form onSubmit={handleLogin} className="admin-login-form">
+                    <input
+                        type="password"
+                        placeholder="Digite a senha"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="admin-login-input soft-neon-input"
+                    />
+
+                    {error && <p className="error-text">{error}</p>}
+
+                    <button type="submit" className="admin-login-button soft-neon-button">
+                        Entrar
+                    </button>
+                </form>
+            </div>
+
+
+        </motion.div>
     );
 }

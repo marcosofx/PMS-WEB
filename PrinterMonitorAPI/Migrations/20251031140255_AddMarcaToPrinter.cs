@@ -5,13 +5,13 @@
 namespace PrinterMonitorAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class AddImagemUrlToPrinter : Migration
+    public partial class AddMarcaToPrinter : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "imagemUrl",
+                name: "Marca",
                 table: "Impressoras",
                 type: "TEXT",
                 nullable: false,
@@ -22,7 +22,7 @@ namespace PrinterMonitorAPI.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "imagemUrl",
+                name: "Marca",
                 table: "Impressoras");
         }
     }

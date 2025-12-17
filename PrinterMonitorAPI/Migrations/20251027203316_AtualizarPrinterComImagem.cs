@@ -11,7 +11,7 @@ namespace PrinterMonitorAPI.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
-                name: "ImagemUrl",
+                name: "imagemUrl",
                 table: "Impressoras",
                 type: "TEXT",
                 nullable: true,
@@ -23,7 +23,7 @@ namespace PrinterMonitorAPI.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
-                name: "ImagemUrl",
+                name: "imagemUrl",
                 table: "Impressoras",
                 type: "TEXT",
                 nullable: false,

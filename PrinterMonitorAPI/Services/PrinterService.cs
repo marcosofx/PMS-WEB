@@ -19,19 +19,25 @@ namespace PrinterMonitorAPI.Services
             _db = db;
         }
 
-        // Listar todas as impressoras
+        // -------------------------------------------------------------
+        // LISTAR
+        // -------------------------------------------------------------
         public async Task<List<Printer>> ListarImpressorasAsync()
         {
-            return await _db.Impressoras.ToListAsync();
+            return await _db.Impressoras.AsNoTracking().ToListAsync();
         }
 
-        // Buscar por ID
+        // -------------------------------------------------------------
+        // BUSCAR POR ID
+        // -------------------------------------------------------------
         public async Task<Printer?> BuscarPorIdAsync(Guid id)
         {
-            return await _db.Impressoras.FindAsync(id);
+            return await _db.Impressoras.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        // Adicionar impressora
+        // -------------------------------------------------------------
+        // ADICIONAR IMPRESSORA
+        // -------------------------------------------------------------
         public async Task<Printer> AdicionarImpressoraAsync(Printer printer)
         {
             printer.Id = Guid.NewGuid();
@@ -40,9 +46,9 @@ namespace PrinterMonitorAPI.Services
             {
                 await _snmpService.AtualizarPrinter(printer);
             }
-            catch
+            catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao atualizar impressora {printer.Nome} ({printer.Ip})");
+                Console.WriteLine($"[PrinterService] Falha ao atualizar SNMP ao adicionar {printer.Nome}: {ex.Message}");
             }
 
             _db.Impressoras.Add(printer);
@@ -51,7 +57,9 @@ namespace PrinterMonitorAPI.Services
             return printer;
         }
 
-        // Remover impressora
+        // -------------------------------------------------------------
+        // REMOVER IMPRESSORA
+        // -------------------------------------------------------------
         public async Task<bool> RemoverImpressoraAsync(Guid id)
         {
             var printer = await _db.Impressoras.FindAsync(id);
@@ -62,43 +70,47 @@ namespace PrinterMonitorAPI.Services
             return true;
         }
 
-        // Atualizar NomeCustomizado e Descricao
+        // -------------------------------------------------------------
+        // ATUALIZAR NOME E DESCRIÇÃO
+        // -------------------------------------------------------------
         public async Task<Printer?> AtualizarInfoAsync(Guid id, string? nomeCustomizado, string? descricao)
         {
             var printer = await _db.Impressoras.FindAsync(id);
             if (printer == null) return null;
 
-            printer.NomeCustomizado = nomeCustomizado ?? printer.NomeCustomizado;
-            printer.Descricao = descricao ?? printer.Descricao;
+            if (!string.IsNullOrWhiteSpace(nomeCustomizado))
+                printer.NomeCustomizado = nomeCustomizado;
+
+            if (!string.IsNullOrWhiteSpace(descricao))
+                printer.Descricao = descricao;
 
             await _db.SaveChangesAsync();
             return printer;
         }
 
-        // Atualizar todas as impressoras via SNMP
+        // -------------------------------------------------------------
+        // ATUALIZAR TODAS AS IMPRESSORAS VIA SNMP
+        // -------------------------------------------------------------
         public async Task<List<Printer>> AtualizarTodasAsync()
         {
             var printers = await _db.Impressoras.ToListAsync();
 
-            var tasks = new List<Task>();
-            foreach (var printer in printers)
+            // Atualiza cada impressora em paralelo, mas usando um contexto separado
+            var tasks = printers.Select(async printer =>
             {
-                tasks.Add(Task.Run(async () =>
+                try
                 {
-                    try
-                    {
-                        await _snmpService.AtualizarPrinter(printer);
-                    }
-                    catch
-                    {
-                        Console.WriteLine($"Erro ao atualizar {printer.Nome} ({printer.Ip})");
-                    }
-                }));
-            }
+                    await _snmpService.AtualizarPrinter(printer);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[PrinterService] Erro atualizando {printer.Nome} ({printer.Ip}): {ex.Message}");
+                }
+            });
 
             await Task.WhenAll(tasks);
-            await _db.SaveChangesAsync();
 
+            await _db.SaveChangesAsync();
             return printers;
         }
     }

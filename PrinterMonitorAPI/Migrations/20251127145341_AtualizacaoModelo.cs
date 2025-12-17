@@ -5,25 +5,32 @@
 namespace PrinterMonitorAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class AddImagemUrlToPrinter : Migration
+    public partial class AtualizacaoModelo : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
+            migrationBuilder.AlterColumn<string>(
                 name: "imagemUrl",
                 table: "Impressoras",
                 type: "TEXT",
-                nullable: false,
-                defaultValue: "");
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "TEXT");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
+            migrationBuilder.AlterColumn<string>(
                 name: "imagemUrl",
-                table: "Impressoras");
+                table: "Impressoras",
+                type: "TEXT",
+                nullable: false,
+                defaultValue: "",
+                oldClrType: typeof(string),
+                oldType: "TEXT",
+                oldNullable: true);
         }
     }
 }

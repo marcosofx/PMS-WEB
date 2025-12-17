@@ -41,14 +41,17 @@ namespace PrinterMonitorAPI.Migrations
                     b.Property<bool>("EColorida")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Foto")
-                        .IsRequired()
+                    b.Property<string>("imagemUrl")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ImagemUrl")
+                    b.Property<string>("imagemUrl")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Ip")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Marca")
                         .IsRequired()
                         .HasColumnType("TEXT");
 

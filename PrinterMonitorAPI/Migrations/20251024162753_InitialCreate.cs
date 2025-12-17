@@ -23,7 +23,7 @@ namespace PrinterMonitorAPI.Migrations
                     Modelo = table.Column<string>(type: "TEXT", nullable: false),
                     NumeroSerie = table.Column<string>(type: "TEXT", nullable: false),
                     Status = table.Column<string>(type: "TEXT", nullable: false),
-                    Foto = table.Column<string>(type: "TEXT", nullable: false),
+                    imagemUrl = table.Column<string>(type: "TEXT", nullable: false),
                     ContadorTotal = table.Column<int>(type: "INTEGER", nullable: false),
                     Toners = table.Column<string>(type: "TEXT", nullable: false),
                     Bandejas = table.Column<string>(type: "TEXT", nullable: false),

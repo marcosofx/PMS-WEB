@@ -11,8 +11,8 @@ using PrinterMonitorAPI.Data;
 namespace PrinterMonitorAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251024162753_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251031140255_AddMarcaToPrinter")]
+    partial class AddMarcaToPrinter
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,7 +48,14 @@ namespace PrinterMonitorAPI.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("imagemUrl")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Ip")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Marca")
                         .IsRequired()
                         .HasColumnType("TEXT");
 

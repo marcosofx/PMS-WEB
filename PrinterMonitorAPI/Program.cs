@@ -16,21 +16,31 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite("Data Source=impressoras.db"));
 
+// SNMP deve ser singleton
 builder.Services.AddSingleton<SNMPService>();
+
+// Serviços de negócio devem ser Scoped
 builder.Services.AddScoped<PrinterService>();
 
-builder.Services.AddControllers();
+// ====================
+// 🔹 Controllers + JSON camelCase
+// ====================
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+});
 
 // ====================
-// 🔹 Configura CORS para a rede local
+// 🔹 CORS
 // ====================
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("ReactPolicy", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
     });
 });
 
@@ -39,7 +49,7 @@ builder.Services.AddCors(options =>
 // ====================
 builder.Services.Configure<FormOptions>(options =>
 {
-    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB
+    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10 MB
 });
 
 var app = builder.Build();
@@ -48,15 +58,20 @@ var app = builder.Build();
 // 🔹 Middleware
 // ====================
 app.UseCors("ReactPolicy");
-app.UseHttpsRedirection();
+
+// ⚠️ Se não usa HTTPS interno, COMENTE
+// app.UseHttpsRedirection();
+
 app.UseRouting();
 app.UseAuthorization();
-app.UseStaticFiles();
 
 // ====================
-// 🔹 Servir arquivos estáticos (uploads)
+// 🔹 Servir arquivos estáticos
 // ====================
-var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
+app.UseStaticFiles();
+
+// Pasta uploads (agora dentro de wwwroot)
+var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
 if (!Directory.Exists(uploadsPath))
     Directory.CreateDirectory(uploadsPath);
 
@@ -67,18 +82,23 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 // ====================
-// 🔹 Mapear Controllers
+// 🔹 Rotas da API
 // ====================
 app.MapControllers();
 
 // ====================
-// 🔹 Configura servidor para rede local
+// 🔹 SPA (React)
 // ====================
-app.Urls.Clear();
-app.Urls.Add("http://0.0.0.0:5000"); // todos os IPs da máquina
+app.MapFallbackToFile("index.html");
 
 // ====================
-// 🔹 Aplica migrations
+// 🔹 Aceitar conexões na rede
+// ====================
+app.Urls.Clear();
+app.Urls.Add("http://0.0.0.0:5000");
+
+// ====================
+// 🔹 Executar migrations automaticamente
 // ====================
 using (var scope = app.Services.CreateScope())
 {
