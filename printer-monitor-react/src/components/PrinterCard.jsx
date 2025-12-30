@@ -1,6 +1,6 @@
 ﻿import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { API_BASE } from "../api/printerApi";
 
@@ -14,6 +14,20 @@ const getTonerColor = (k) => {
     }
 };
 
+const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+        case "atenção":
+            return "#FFD24D"; // amarelo
+        case "indisponível":
+        case "indisponivel":
+            return "#FF4D4F"; // vermelho
+        case "rodando":
+            return "#22C55E"; // verde
+        default:
+            return "#94A3B8"; // neutro
+    }
+};
+
 export default function PrinterCard({ printer, refreshInterval = 30000 }) {
 
     const [snmpData, setSnmpData] = useState({
@@ -23,9 +37,9 @@ export default function PrinterCard({ printer, refreshInterval = 30000 }) {
         status: printer.status ?? "N/A",
     });
 
-    const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [imageError, setImageError] = useState(false);
+    const [expanded, setExpanded] = useState(false);
 
     const toners = printer.toners || {};
     const toneEntries = printer.eColorida
@@ -37,8 +51,7 @@ export default function PrinterCard({ printer, refreshInterval = 30000 }) {
     const fetchSnmp = async () => {
         try {
             setIsLoading(true);
-            const url = `${API_BASE}/snmp/${printer.id}`;
-            const res = await axios.get(url);
+            const res = await axios.get(`${API_BASE}/snmp/${printer.id}`);
 
             setSnmpData(prev => ({
                 numeroSerie: res.data.numeroSerie ?? prev.numeroSerie,
@@ -48,9 +61,9 @@ export default function PrinterCard({ printer, refreshInterval = 30000 }) {
             }));
 
         } catch (err) {
-            console.log("Erro ao buscar dados SNMP:", err);
+            console.log("Erro ao buscar SNMP:", err);
         } finally {
-            setTimeout(() => setIsLoading(false), 600);
+            setTimeout(() => setIsLoading(false), 500);
         }
     };
 
@@ -58,39 +71,7 @@ export default function PrinterCard({ printer, refreshInterval = 30000 }) {
         fetchSnmp();
         const interval = setInterval(fetchSnmp, refreshInterval);
         return () => clearInterval(interval);
-    },  [printer.id, refreshInterval]);
-
-    const renderPrinterImage = () => {
-        if (!imageError && printer.imagemUrl && printer.imagemUrl.trim() !== "") {
-            return (
-                <img
-                    className="printer-photo"
-                    src={printer.imagemUrl}
-                    alt={printer.nomeCustomizado || "Impressora"}
-                    onError={() => {
-                        console.warn("Erro ao carregar imagem:", printer.imagemUrl);
-                        setImageError(true);
-                    }}
-                />
-            );
-        }
-
-        return (
-            <div className="printer-placeholder">
-                <svg
-                    width="64"
-                    height="64"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                >
-                    <rect x="3" y="7" width="18" height="14" rx="2" ry="2" />
-                    <path d="M16 3H8v4h8V3z" />
-                </svg>
-            </div>
-        );
-    };
+    }, [printer.id, refreshInterval]);
 
     const tonerValues = printer.eColorida
         ? Object.values(printer.toners || {})
@@ -105,146 +86,134 @@ export default function PrinterCard({ printer, refreshInterval = 30000 }) {
             ? "rgba(255,215,0,0.8)"
             : null;
 
+    const renderImage = () => {
+        if (!imageError && printer.imagemUrl) {
+            return (
+                <img
+                    className="printer-photo"
+                    src={printer.imagemUrl}
+                    alt={printer.nomeCustomizado}
+                    onError={() => setImageError(true)}
+                />
+            );
+        }
+
+        return (
+            <div className="printer-placeholder">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="7" width="18" height="14" rx="2" />
+                    <path d="M16 3H8v4h8V3z" />
+                </svg>
+            </div>
+        );
+    };
+
     return (
         <motion.article
             className="printer-card"
+            onClick={() => setExpanded(!expanded)}
             animate={
                 neonEffect
                     ? {
                         boxShadow: [
-                            `0 0 0px ${neonEffect}`,
-                            `0 0 10px ${neonEffect}`,
-                            `0 0 20px ${neonEffect}`,
-                            `0 0 10px ${neonEffect}`,
-                            `0 0 0px ${neonEffect}`,
+                            `0 0 0 ${neonEffect}`,
+                            `0 0 12px ${neonEffect}`,
+                            `0 0 22px ${neonEffect}`,
+                            `0 0 12px ${neonEffect}`,
                         ],
                     }
-                    : { boxShadow: "none" }
+                    : {}
             }
-            transition={{
-                duration: 2,
-                repeat: neonEffect ? Infinity : 0,
-                repeatType: "mirror",
-            }}
-            style={{
-                position: "relative",
-                borderRadius: "12px",
-                background: "#1a1d21",
-                border: neonEffect
-                    ? `1px solid ${neonEffect}`
-                    : "1px solid rgba(255,255,255,0.1)",
-                overflow: "hidden",
-                padding: "1rem",
-            }}
+            transition={{ duration: 2, repeat: neonEffect ? Infinity : 0 }}
         >
             {isLoading && (
                 <motion.div
-                    style={{
-                        position: "absolute",
-                        top: "10px",
-                        right: "10px",
-                        color: "#00BFFF",
-                    }}
+                    style={{ position: "absolute", top: 10, right: 10 }}
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                 >
-                    <Loader2 size={22} />
+                    <Loader2 size={18} />
                 </motion.div>
             )}
 
+            {/* ===== TOPO (SEMPRE VISÍVEL) ===== */}
             <div className="printer-top">
-                {renderPrinterImage()}
+                {renderImage()}
 
                 <div className="printer-meta">
                     <h3 className="printer-name">{printer.nomeCustomizado}</h3>
-                    <p className="printer-desc">{printer.descricao || "Sem descrição"}</p>
-                </div>
-            </div>
 
-            <div className="printer-body">
-                <div className="printer-info">
-
-                    {/* 🔗 LINK NO IP (ajuste solicitado) */}
-                    <div>
+                    <div style={{ fontSize: 12 }}>
                         <strong>IP:</strong>{" "}
                         <a
                             href={`http://${printer.ip}`}
                             target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ color: "#4da6ff", textDecoration: "underline" }}
+                            rel="noreferrer"
+                            style={{ color: "#4DA6FF" }}
+                            onClick={(e) => e.stopPropagation()}
                         >
                             {printer.ip}
                         </a>
                     </div>
 
-                    <div>
-                        <strong>Série:</strong>{" "}
-                        {isLoading ? <span className="skeleton w-80" /> : snmpData.numeroSerie}
-                    </div>
-
-                    <div>
-                        <strong>Status:</strong>{" "}
-                        {isLoading ? <span className="skeleton w-60" /> : snmpData.status}
-                    </div>
-
-                    <div><strong>Colorida:</strong> {printer.eColorida ? "Sim" : "Não"}</div>
-
-                    <div>
-                        <strong>Contador:</strong>{" "}
-                        {isLoading ? <span className="skeleton w-40" /> : snmpData.contadorTotal}
-                    </div>
-                </div>
-
-                <div className="printer-toners">
-                    {isLoading ? (
-                        <div className="skeleton-toner" />
-                    ) : toneEntries.length ? (
-                        toneEntries.map(([k, v]) => (
-                            <div className="toner" key={k}>
-                                <div className="toner-label">{k}</div>
-                                <div className="toner-bar">
-                                    <div
-                                        className="toner-fill"
-                                        style={{
-                                            width: `${v}%`,
-                                            background: getTonerColor(k),
-                                        }}
-                                    />
-                                </div>
-                                <div className="toner-percent">{v}%</div>
-                            </div>
-                        ))
-                    ) : (
-                        <div className="no-toner">Sem toner detectado</div>
-                    )}
-                </div>
-
-                <div className="printer-info">
-                    <button
-                        className="btn btn-sm btn-outline-light"
-                        onClick={() => setIsAlertOpen(!isAlertOpen)}
-                        style={{ marginTop: "0.5rem" }}
+                    <div
+                        style={{
+                            fontSize: 12,
+                            fontWeight: "bold",
+                            color: getStatusColor(snmpData.status),
+                        }}
                     >
-                        {isAlertOpen ? "Ocultar alertas" : "Mostrar alertas"}
-                    </button>
-
-                    {isAlertOpen && (
-                        <div
-                            className="smooth-update"
-                            style={{
-                                marginTop: "0.5rem",
-                                padding: "0.5rem",
-                                background: "rgba(255,255,255,0.05)",
-                                borderRadius: "6px",
-                            }}
-                        >
-                            {snmpData.alertas?.length
-                                ? snmpData.alertas.map((a, i) => <div key={i}>⚠️ {a}</div>)
-                                : "Nenhum alerta ativo"}
-                        </div>
-                    )}
+                        {snmpData.status}
+                    </div>
                 </div>
             </div>
+
+            {/* ===== EXPANSÃO ===== */}
+            <AnimatePresence>
+                {expanded && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <div className="printer-body">
+
+                            <div className="printer-info">
+                                <div><strong>Série:</strong> {snmpData.numeroSerie}</div>
+                                <div><strong>Contador:</strong> {snmpData.contadorTotal}</div>
+                                <div><strong>Colorida:</strong> {printer.eColorida ? "Sim" : "Não"}</div>
+                            </div>
+
+                            <div className="printer-toners">
+                                {toneEntries.map(([k, v]) => (
+                                    <div className="toner" key={k}>
+                                        <div className="toner-label">{k}</div>
+                                        <div className="toner-bar">
+                                            <div
+                                                className="toner-fill"
+                                                style={{
+                                                    width: `${v}%`,
+                                                    background: getTonerColor(k),
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="toner-percent">{v}%</div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="printer-info">
+                                {snmpData.alertas?.length
+                                    ? snmpData.alertas.map((a, i) => (
+                                        <div key={i}>⚠️ {a}</div>
+                                    ))
+                                    : "Nenhum alerta ativo"}
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </motion.article>
     );
 }

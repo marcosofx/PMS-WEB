@@ -1,4 +1,4 @@
-:root {
+﻿:root {
     --bg: #0f1724;
     --card: #0b1220;
     --muted: #94a3b8;
@@ -110,7 +110,7 @@ body {
 
 /* Printer Card */
 .printer-card {
-    width: 220px;
+    width: 210px;
     background: var(--card);
     border-radius: var(--radius);
     padding: 20px;
@@ -363,7 +363,7 @@ button.danger {
     box-shadow: 0 0 10px rgba(0, 191, 255, 0.4);
 }
 
-/* T�tulo */
+/* Título */
 .admin-login-title {
     margin-bottom: 1.5rem;
     font-size: 1.8rem;
@@ -399,7 +399,7 @@ button.danger {
     border-color: #00bfff;
 }
 
-/* Bot�o com neon suave */
+/* Botão com neon suave */
 .admin-login-button {
     padding: 0.75rem 1rem;
     border-radius: 8px;
@@ -516,4 +516,82 @@ button.danger {
     .printer-card {
         width: 100%;
     }
+}
+
+.noc-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--soft);
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+    .noc-toggle i {
+        font-size: 20px;
+    }
+
+    .noc-toggle:hover {
+        background: rgba(255,255,255,0.06);
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+
+    .noc-toggle.active {
+        background: var(--accent);
+        color: #042f2e;
+        font-weight: bold;
+    }
+
+/* Botão sair do Modo NOC */
+.noc-exit {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #5eead4;
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+}
+
+    .noc-exit:hover {
+        background: rgba(0, 0, 0, 0.9);
+        transform: scale(1.05);
+    }
+
+/* =========================
+   MODO NOC (TELÃO)
+========================= */
+.noc-mode .app-header,
+.noc-mode .app-footer {
+    display: none;
+}
+
+.noc-mode .app-main {
+    max-width: 100%;
+    margin: 15px;
+    padding: 12px;
+
+}
+
+.noc-mode .cards-grid {
+    justify-content: center;
+    gap: 18px;
+}
+
+.noc-mode .printer-card {
+    width: 260px;
+    font-size: 15px;
 }

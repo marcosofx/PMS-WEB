@@ -6,74 +6,127 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.FileProviders;
+using Serilog;
 using System.IO;
+
+
+// ======================================================
+// 🔹 CAMINHOS BASE (AppData)
+// ======================================================
+var appDataPath = Path.Combine(
+    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+    "PMS"
+);
+
+Directory.CreateDirectory(appDataPath);
+
+var logsPath = Path.Combine(appDataPath, "logs");
+Directory.CreateDirectory(logsPath);
+
+var dbPath = Path.Combine(appDataPath, "impressoras.db");
+
+// ======================================================
+// 🔹 SERILOG (LOG EM ARQUIVO)
+// ======================================================
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.File(
+        Path.Combine(logsPath, "pms-.log"),
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 15
+    )
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ====================
-// 🔹 Configurações Gerais
-// ====================
+// ======================================================
+// 🔹 RODAR COMO SERVIÇO DO WINDOWS
+// ======================================================
+builder.Host.UseWindowsService();
+
+// ======================================================
+// 🔹 LOGGING
+// ======================================================
+builder.Host.UseSerilog();
+
+// ======================================================
+// 🔹 BANCO DE DADOS (SQLite)
+// ======================================================
+var connectionString = $"Data Source={dbPath};Cache=Shared";
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite("Data Source=impressoras.db"));
-
-// SNMP deve ser singleton
-builder.Services.AddSingleton<SNMPService>();
-
-// Serviços de negócio devem ser Scoped
-builder.Services.AddScoped<PrinterService>();
-
-// ====================
-// 🔹 Controllers + JSON camelCase
-// ====================
-builder.Services.AddControllers().AddJsonOptions(options =>
 {
-    options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    options.UseSqlite(connectionString);
 });
 
-// ====================
+// ======================================================
+// 🔹 SERVIÇOS
+// ======================================================
+builder.Services.AddSingleton<SNMPService>();
+builder.Services.AddScoped<PrinterService>();
+
+// ======================================================
+// 🔹 CONTROLLERS
+// ======================================================
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy =
+            System.Text.Json.JsonNamingPolicy.CamelCase;
+    });
+
+// ======================================================
 // 🔹 CORS
-// ====================
+// ======================================================
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("ReactPolicy", policy =>
     {
-        policy
-            .AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
-// ====================
-// 🔹 Configuração de Uploads
-// ====================
+// ======================================================
+// 🔹 UPLOAD
+// ======================================================
 builder.Services.Configure<FormOptions>(options =>
 {
-    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10 MB
+    options.MultipartBodyLengthLimit = 10 * 1024 * 1024;
 });
 
 var app = builder.Build();
 
-// ====================
-// 🔹 Middleware
-// ====================
+// ======================================================
+// 🔹 GARANTIR BANCO
+// ======================================================
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.EnsureCreated();
+}
+
+// ======================================================
+// 🔹 MIDDLEWARE
+// ======================================================
 app.UseCors("ReactPolicy");
-
-// ⚠️ Se não usa HTTPS interno, COMENTE
-// app.UseHttpsRedirection();
-
 app.UseRouting();
 app.UseAuthorization();
 
-// ====================
-// 🔹 Servir arquivos estáticos
-// ====================
+// ======================================================
+// 🔹 FRONTEND (VUE)
+// ======================================================
+app.UseDefaultFiles();
 app.UseStaticFiles();
 
-// Pasta uploads (agora dentro de wwwroot)
-var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-if (!Directory.Exists(uploadsPath))
-    Directory.CreateDirectory(uploadsPath);
+// uploads
+var uploadsPath = Path.Combine(
+    app.Environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"),
+    "uploads"
+);
+
+Directory.CreateDirectory(uploadsPath);
 
 app.UseStaticFiles(new StaticFileOptions
 {
@@ -81,32 +134,33 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/uploads"
 });
 
-// ====================
-// 🔹 Rotas da API
-// ====================
+// ======================================================
+// 🔹 ROTAS
+// ======================================================
 app.MapControllers();
-
-// ====================
-// 🔹 SPA (React)
-// ====================
 app.MapFallbackToFile("index.html");
 
-// ====================
-// 🔹 Aceitar conexões na rede
-// ====================
+// ======================================================
+// 🔹 PORTA CONFIGURÁVEL
+// ======================================================
+var port = builder.Configuration.GetValue<int>("Port", 5000);
+
 app.Urls.Clear();
-app.Urls.Add("http://0.0.0.0:5000");
+app.Urls.Add($"http://0.0.0.0:{port}");
 
-// ====================
-// 🔹 Executar migrations automaticamente
-// ====================
-using (var scope = app.Services.CreateScope())
+// ======================================================
+// 🔹 START
+// ======================================================
+try
 {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    db.Database.Migrate();
+    Log.Information("PMS iniciado com sucesso na porta {Port}", port);
+    app.Run();
 }
-
-// ====================
-// 🔹 Inicializa
-// ====================
-app.Run();
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Falha crítica ao iniciar o PMS");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

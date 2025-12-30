@@ -7,7 +7,7 @@ using PrinterMonitorAPI.Data;
 
 #nullable disable
 
-namespace PrinterMonitorAPI.Migrations
+namespace PMS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -41,12 +41,6 @@ namespace PrinterMonitorAPI.Migrations
                     b.Property<bool>("EColorida")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("imagemUrl")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("imagemUrl")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Ip")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -77,6 +71,9 @@ namespace PrinterMonitorAPI.Migrations
 
                     b.Property<string>("Toners")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("imagemUrl")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

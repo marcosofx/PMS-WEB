@@ -8,6 +8,16 @@ export default function Home() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // 🔥 MODO NOC (por enquanto fixo, depois vem do App)
+    const [nocMode] = useState(true);
+
+    // 🔥 CONTROLE DE EXPANSÃO
+    const [expandedId, setExpandedId] = useState(null);
+
+    const toggleExpand = (id) => {
+        setExpandedId((prev) => (prev === id ? null : id));
+    };
+
     // 🔄 Carregamento progressivo
     const load = async () => {
         setLoading(true);
@@ -23,7 +33,6 @@ export default function Home() {
                 setPrinters([...buffer]);
                 await new Promise((res) => setTimeout(res, 120));
             }
-
         } catch (err) {
             console.error(err);
             setError(err.message);
@@ -36,7 +45,7 @@ export default function Home() {
         load();
     }, []);
 
-    // Skeleton visual
+    // 🧱 Skeleton visual (NÃO REMOVIDO)
     const SkeletonCard = ({ id }) => (
         <motion.div
             key={`skeleton-${id}`}
@@ -127,40 +136,40 @@ export default function Home() {
     );
 
     return (
-        <section
-            className="cards-grid"
-            style={{
-                padding: "1rem",
-                display: "flex",
-                flexWrap: "wrap",
-                justifyContent: "center",
-                gap: "1rem",
-            }}
-        >
+        <section className={`cards-grid ${nocMode ? "noc-mode" : ""}`}>
             {error && <div className="error">{error}</div>}
 
             <AnimatePresence mode="popLayout">
-                {/* Skeleton enquanto carrega */}
+                {/* Skeleton */}
                 {loading &&
                     !error &&
-                    [...Array(8)].map((_, i) => (
-                        <SkeletonCard key={`skeleton-${i}`} id={i} />
+                    [...Array(12)].map((_, i) => (
+                        <SkeletonCard key={i} id={i} />
                     ))}
 
-                {/* Cards reais carregando progressivamente */}
-                {printers.map((printer, i) => (
-                    <motion.div
-                        key={printer.id ?? i}
-                        initial={{ opacity: 0, scale: 0.96 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ duration: 0.4, ease: "easeOut" }}
-                    >
-                        <PrinterCard printer={printer} />
-                    </motion.div>
-                ))}
+                {/* Cards */}
+                {printers.map((printer, i) => {
+                    const isExpanded = expandedId === printer.id;
+
+                    return (
+                        <motion.div
+                            key={printer.id ?? i}
+                            layout
+                            initial={{ opacity: 0, scale: 0.96 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ duration: 0.35 }}
+                        >
+                            <PrinterCard
+                                printer={printer}
+                                nocMode={nocMode}
+                                expanded={isExpanded}
+                                onToggle={() => toggleExpand(printer.id)}
+                            />
+                        </motion.div>
+                    );
+                })}
             </AnimatePresence>
         </section>
     );
 }
-// ok
